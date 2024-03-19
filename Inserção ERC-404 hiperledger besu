@@ -1,0 +1,65 @@
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.tx.Contract;
+import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.protocol.http.HttpService;
+import java.math.BigInteger;
+import java.util.concurrent.ExecutionException;
+
+public class HyperledgerBesuExample {
+
+    public static void main(String[] args) {
+        // Conectando ao nó Hyperledger Besu
+        Web3j web3j = Web3j.build(new HttpService("http://localhost:8545"));
+
+        try {
+            // Executando o protocolo ERC-404
+            ERC404Protocol.executeProtocol();
+
+            // Carregando as credenciais da sua carteira
+            Credentials credentials = Credentials.create("suaChavePublica");
+
+            // Carregando o contrato inteligente
+            YourContract contract = YourContract.load(
+                    "enderecoContrato", web3j, credentials, new DefaultGasProvider());
+
+            // Chamando a função do contrato inteligente
+            TransactionReceipt receipt = contract.yourSmartContractFunction().sendAsync().get();
+
+            // Imprimindo o hash da transação
+            String transactionHash = receipt.getTransactionHash();
+            System.out.println("Transação enviada com sucesso! Hash: " + transactionHash);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static class YourContract extends Contract {
+        // Defina os métodos do seu contrato inteligente aqui
+
+        protected YourContract(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+            super("", contractAddress, web3j, credentials, gasPrice, gasLimit);
+        }
+
+        public static YourContract load(String contractAddress, Web3j web3j, Credentials credentials, org.web3j.tx.gas.ContractGasProvider contractGasProvider) {
+            return new YourContract(contractAddress, web3j, credentials, contractGasProvider.getGasPrice(), contractGasProvider.getGasLimit());
+        }
+
+        // Adicione métodos para chamar as funções do seu contrato inteligente aqui
+        public TransactionReceipt yourSmartContractFunction() {
+            // Aqui você pode chamar a função desejada do seu contrato inteligente
+            // Exemplo:
+            // return executeTransactionAsync();
+            return null;
+        }
+    }
+
+    public static class ERC404Protocol {
+        public static void executeProtocol() {
+            // Implemente aqui a lógica do protocolo ERC-404
+            System.out.println("Protocolo ERC-404 executado com sucesso!");
+        }
+    }
+}
